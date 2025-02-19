@@ -16,6 +16,15 @@ public class GridManager : MonoBehaviour
         CreateGrid();
     }
 
+    public void RegisterTile(Tile tile)
+    {
+        // Ensure the node at this coordinate is updated to match the tile's walkability
+        if (grid.ContainsKey(tile.cords))
+        {
+            grid[tile.cords].walkable = tile.walkable;
+        }
+    }
+
     public Node GetNode(Vector2Int coordinates)
     {
         if (grid.ContainsKey(coordinates))
@@ -31,6 +40,14 @@ public class GridManager : MonoBehaviour
         if (grid.ContainsKey(coordinates))
         {
             grid[coordinates].walkable = false;
+        }
+    }
+
+    public void UpdateNodeWalkability(Vector2Int coordinates, bool isWalkable)
+    {
+        if (grid.ContainsKey(coordinates))
+        {
+            grid[coordinates].walkable = isWalkable;
         }
     }
 
@@ -63,6 +80,7 @@ public class GridManager : MonoBehaviour
 
         return position;
     }
+
     private void CreateGrid()
     {
         for (int x = 0; x < gridSize.x; x++)
@@ -72,12 +90,13 @@ public class GridManager : MonoBehaviour
                 Vector2Int cords = new Vector2Int(x, y);
                 grid.Add(cords, new Node(cords, true));
 
-                //GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                //Vector3 position = new Vector3(cords.x * unitGridSize, 0f, cords.y * unitGridSize);
-                //cube.transform.position = position;
-                //cube.transform.SetParent(transform);
+                // Optionally create visual tiles here and set their walkability
+                // GameObject tileGO = Instantiate(tilePrefab, new Vector3(x * unityGridSize, 0, y * unityGridSize), Quaternion.identity);
+                // Tile tile = tileGO.GetComponent<Tile>();
+                // tile.cords = cords;
+                // tile.walkable = true;
+                // RegisterTile(tile);
             }
         }
     }
-
 }

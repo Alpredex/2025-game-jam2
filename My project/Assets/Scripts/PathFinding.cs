@@ -26,8 +26,7 @@ public class Pathfinding : MonoBehaviour
     };
 
     private List<Node> path = new List<Node>();
-    private LineRenderer lineRenderer;
-    private GameObject destinationMarker;
+    private Vector2Int currentUnitPosition;  // New field to track current unit position
 
     private void Awake()
     {
@@ -36,33 +35,23 @@ public class Pathfinding : MonoBehaviour
         {
             grid = gridManager.Grid;
         }
-
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.startColor = Color.green;
-        lineRenderer.endColor = Color.green;
-        lineRenderer.positionCount = 0;
-
-        destinationMarker = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        destinationMarker.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
-        destinationMarker.GetComponent<Renderer>().material.color = Color.red;
-        destinationMarker.SetActive(false);
+        currentUnitPosition = startCords;  // Initialize current position
     }
 
     public List<Node> GetNewPath(Vector2Int? coordinates = null)
     {
-        if (!grid.TryGetValue(startCords, out startNode) || !grid.TryGetValue(targetCords, out targetNode))
+        if (!grid.TryGetValue(currentUnitPosition, out startNode) || !grid.TryGetValue(targetCords, out targetNode))
         {
             Debug.LogError("Invalid start or target node!");
             return new List<Node>();
         }
 
         gridManager.ResetNodes();
-        BreadthFirstSearch(coordinates ?? startCords);
+        BreadthFirstSearch(coordinates ?? currentUnitPosition);  // Use current position for BFS
         path = BuildPath();
-        UpdateLineRenderer();
+
+        currentUnitPosition = targetCords;  // Update current position
+
         return path;
     }
 
@@ -148,44 +137,10 @@ public class Pathfinding : MonoBehaviour
         return path;
     }
 
-    private void UpdateLineRenderer()
-    {
-        if (path == null || path.Count == 0)
-        {
-            ClearPathVisualization();
-            return;
-        }
-
-        lineRenderer.positionCount = path.Count;
-        for (int i = 0; i < path.Count; i++)
-        {
-            lineRenderer.SetPosition(i, new Vector3(path[i].cords.x, 0.75f, path[i].cords.y));
-        }
-
-        destinationMarker.SetActive(true);
-        destinationMarker.transform.position = new Vector3(targetCords.x, 0.75f, targetCords.y);
-    }
-
-    public void NotifyReceivers()
-    {
-        BroadcastMessage("RecalculatePath", false, SendMessageOptions.DontRequireReceiver);
-    }
-
     public void SetNewDestination(Vector2Int startCoordinates, Vector2Int targetCoordinates)
     {
         startCords = startCoordinates;
         targetCords = targetCoordinates;
         GetNewPath();
-    }
-
-    public void OnUnitReachedDestination()
-    {
-        ClearPathVisualization();
-    }
-
-    private void ClearPathVisualization()
-    {
-        lineRenderer.positionCount = 0;
-        destinationMarker.SetActive(false);
     }
 }

@@ -21,21 +21,20 @@ public class Labeller : MonoBehaviour
         label = GetComponentInChildren<TextMeshPro>();
         label.enabled = false;
         DisplayCords();
+        CheckAboveTile();
     }
 
     private void Update()
     {
         if (!Application.isPlaying)
         {
-
             label.enabled = true;
         }
-
 
         DisplayCords();
         transform.name = cords.ToString();
 
-        ToggleLables();
+        ToggleLabels();
         SetLabelColor();
     }
 
@@ -73,11 +72,46 @@ public class Labeller : MonoBehaviour
         label.text = $"{cords.x}, {cords.y}";
     }
 
-    void ToggleLables()
+    void ToggleLabels()
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
             label.enabled = !label.IsActive();
+        }
+    }
+
+    void CheckAboveTile()
+    {
+        // Start from slightly above the tile's surface
+        Vector3 startPosition = transform.position + new Vector3(0f, 0.1f, 0f);
+        float checkDistance = 2.0f; // Adjust this value if needed
+        RaycastHit hit;
+
+        // Visualize the raycast
+        Debug.DrawRay(startPosition, Vector3.up * checkDistance, Color.green, 5.0f);
+
+        // Cast a ray upwards
+        if (Physics.Raycast(startPosition, Vector3.up, out hit, checkDistance))
+        {
+            Debug.Log($"Raycast hit: {hit.transform.name} with tag {hit.transform.tag}");
+
+            if (hit.transform.CompareTag("wall"))
+            {
+                gridManager.BlockNode(cords);
+
+                // Update the node and its visual representation
+                Node node = gridManager.GetNode(cords);
+                if (node != null)
+                {
+                    node.walkable = false;
+                }
+                // Change tile appearance if desired
+                GetComponent<Renderer>().material.color = Color.red;
+            }
+        }
+        else
+        {
+            Debug.Log("No wall detected above this tile.");
         }
     }
 }

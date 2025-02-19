@@ -70,6 +70,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cords: {x: 0, y: 0}
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  blockedColor: {r: 1, g: 0, b: 0, a: 1}
+  exploredColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  pathColor: {r: 1, g: 0.5, b: 0, a: 1}
 --- !u!114 &40600874505896652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,6 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2197a6b779a46f443bca2aa2e572cd6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cords: {x: 0, y: 0}
 --- !u!1 &2828328391614089055
 GameObject:
   m_ObjectHideFlags: 0
